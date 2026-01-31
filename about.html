@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ABOUT | KAENTA</title>
+
+  <!-- 共通CSS（あなたの header.css を使うなら） -->
+  <link rel="stylesheet" href="./header.css" />
+  <!-- このページ専用 -->
+  <link rel="stylesheet" href="./about.css" />
+</head>
+
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <!-- ロゴ（トップへ戻すなら index.html などに） -->
+    <a class="header-logo" href="./index.html" aria-label="KAENTA Home">
+      <span class="logo-main">KAENTA</span>
+      <span class="logo-sub">kaori yoshioka</span>
+    </a>
+
+    <!-- ナビ -->
+    <nav class="header-nav" aria-label="Primary">
+      <a href="./sstyle.html">Style</a>
+      <a href="./about.html">About</a>
+      <a href="./blog.html">Blog</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+
+    <!-- 右端：電話（スマホでタップすると電話） -->
+    <div class="header-info">
+      <a href="tel:0000000000">TEL 000-000-0000</a>
+    </div>
+  </div>
+</header>
+
+  <main class="about">
+    <!-- HERO -->
+    <section class="about-hero">
+      <div class="about-hero__bg" aria-hidden="true"></div>
+      <div class="about-hero__inner">
+        <p class="about-hero__eyebrow gs_reveal">ABOUT</p>
+        <h1 class="about-hero__title gs_reveal">
+          Ocean View Atelier,<br />
+          Quietly crafted.
+        </h1>
+        <p class="about-hero__lead gs_reveal">
+          余白のある暮らしに、静かな強さを。<br />
+          海の気配と、手仕事の温度。
+        </p>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="content">
+      <div class="features">
+
+        <!-- 1 -->
+        <article class="features__item features__item--left">
+          <div class="features__image gs_reveal gs_reveal_fromLeft">
+            <div class="features__card">
+              <img class="features__img" src="./assets/about-portrait.png" alt="KAENTA portrait" />
+            </div>
+          </div>
+          <div class="features__content">
+            <h2 class="features__title gs_reveal">Our Philosophy</h2>
+            <p class="features__description gs_reveal">
+              流行よりも、時間に耐えるかたち。<br />
+              触れた瞬間にわかる、静かな上質。<br />
+              ほんの少しの「凛」と「余白」を、日常へ。
+            </p>
+          </div>
+        </article>
+
+        <!-- 2 -->
+        <article class="features__item features__item--right">
+          <div class="features__image gs_reveal gs_reveal_fromRight">
+            <div class="features__card">
+              <img class="features__img" src="./assets/about-work.png" alt="Craft process" />
+            </div>
+          </div>
+          <div class="features__content">
+            <h2 class="features__title gs_reveal">Craft & Materials</h2>
+            <p class="features__description gs_reveal">
+              素材の表情を邪魔しない設計。<br />
+              仕立ての線、コバの輪郭、金具の静けさ。<br />
+              使うほどに、持ち主の時間が宿るものへ。
+            </p>
+          </div>
+        </article>
+
+        <!-- 3 -->
+        <article class="features__item features__item--left">
+          <div class="features__image gs_reveal gs_reveal_fromLeft">
+            <div class="features__card">
+              <img class="features__img" src="./assets/indigo-hero.png" alt="Indigo" />
+            </div>
+          </div>
+          <div class="features__content">
+            <h2 class="features__title gs_reveal">Indigo & Ocean</h2>
+            <p class="features__description gs_reveal">
+              藍は、深さのグラデーション。<br />
+              海の色は、毎日少しずつ違う。<br />
+              その揺らぎを、プロダクトの表情に。
+            </p>
+          </div>
+        </article>
+
+        <!-- 4 -->
+        <article class="features__item features__item--right">
+          <div class="features__image gs_reveal gs_reveal_fromRight">
+            <div class="features__card">
+              <img class="features__img" src="./assets/workshop01.png" alt="Workshop" />
+            </div>
+          </div>
+          <div class="features__content">
+            <h2 class="features__title gs_reveal">Workshop</h2>
+            <p class="features__description gs_reveal">
+              体験は、記憶として残るデザイン。<br />
+              手を動かす時間が、ものの価値を深くする。<br />
+              「つくる」から始まる、あなたのKAENTA。
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="about-end">
+      <div class="about-end__inner">
+        <h3 class="gs_reveal">From atelier to your daily life.</h3>
+        <p class="gs_reveal">
+          KAENTAは、静けさと輪郭を大切にしています。<br />
+          必要なら、次はこの下に「STORES購入導線」や「Instagram誘導」を自然に繋げよう。
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- GSAP -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+
+  <!-- このページ専用 -->
+  <script src="./about.js"></script>
+</body>
+</html>

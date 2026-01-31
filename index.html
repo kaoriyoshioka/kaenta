@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vertical Loop</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <!-- ロゴ（トップへ戻すなら index.html などに） -->
+    <a class="header-logo" href="./index.html" aria-label="KAENTA Home">
+      <span class="logo-main">KAENTA</span>
+      <span class="logo-sub">kaori yoshioka</span>
+    </a>
+
+    <!-- ナビ -->
+    <nav class="header-nav" aria-label="Primary">
+      <a href="./index.html" >Top</a>
+      <a href="./sstyle.html">Style</a>
+      <a href="./about.html">About</a>
+      <a href="./blog.html">Blog</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+
+    <!-- 右端：電話（スマホでタップすると電話） -->
+    <div class="header-info">
+      <a href="tel:0000000000">TEL 000-000-0000</a>
+    </div>
+  </div>
+</header>
+
+  <!-- スクロール量を作るだけ -->
+  <div class="spacer"></div>
+<div class="hero-logo">KAENTA</div>
+
+  <div class="gallery" aria-hidden="true">
+    <div class="col" data-dir="1">
+      <div class="image"><img src="./assets/hero-main.png" alt=""></div>
+      <div class="image"><img src="./assets/workshop01.png" alt=""></div>
+      <div class="image"><img src="./assets/about-portrait.png" alt=""></div>
+    </div>
+
+    <!-- 真ん中だけ逆方向に流す -->
+    <div class="col" data-dir="-1">
+      <div class="image"><img src="./assets/product02.png" alt=""></div>
+      <div class="image"><img src="./assets/product03.png" alt=""></div>
+      <div class="image"><img src="./assets/product01.png" alt=""></div>
+    </div>
+
+    <div class="col" data-dir="1">
+      <div class="image"><img src="./assets/hero-main.png" alt=""></div>
+      <div class="image"><img src="./assets/workshop01.png" alt=""></div>
+      <div class="image"><img src="./assets/about-portrait.png" alt=""></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>

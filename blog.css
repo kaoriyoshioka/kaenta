@@ -1,0 +1,221 @@
+*{box-sizing:border-box}
+html{ overscroll-behavior: contain; scroll-behavior:smooth; }
+body{
+  margin:0;
+  background: rgb(20 20 23);
+  color: rgba(255,255,255,.88); /* ← ここだけ直す：本文が見える色に */
+  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+}
+
+/* ===== KAENTA header ===== */
+.site-header{
+  position: fixed;
+  top:0; left:0; width:100%;
+  z-index: 100;
+  background: rgba(10,10,12,.72);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.header-inner{
+  height: 72px;
+  width: min(1200px, 92vw);
+  margin: 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.header-logo{ text-decoration:none; color:rgba(255,255,255,.92); display:flex; flex-direction:column; line-height:1.05; }
+.logo-main{ font-weight:700; letter-spacing:.18em; font-size:14px; }
+.logo-sub{ font-size:11px; letter-spacing:.10em; opacity:.6; margin-top:4px; }
+.header-nav{ display:flex; gap:18px; }
+.header-nav a{ color:rgba(255,255,255,.70); text-decoration:none; font-size:12px; letter-spacing:.14em; padding:10px 6px; border-radius:10px; }
+.header-nav a:hover{ color:rgba(255,255,255,.92); }
+.header-nav a[aria-current="page"]{ color:rgba(255,255,255,.96); text-decoration:underline; text-underline-offset:6px; }
+.header-info a{ color:rgba(255,255,255,.65); text-decoration:none; font-size:12px; letter-spacing:.12em; }
+.header-info a:hover{ color:rgba(255,255,255,.9); }
+
+/* ===== timeline nav ===== */
+/* 使う場合だけ表示させたいなら：bodyに .has-timeline を付ける運用が最強 */
+.timeline{ display:none; }
+
+/* タイムライン無し：余白はヘッダー分だけ */
+main{ padding-top: 72px; }
+
+/* ===== main sections ===== */
+section{
+  --h: calc(var(--i) * 28);
+  min-height: 100vh;
+  padding: 8rem 0 max(5vh, 2rem);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background-color: hsl(var(--h, 0) 65% 55%);
+}
+
+.container{
+  width: min(1200px, 92vw);
+  transform-style: preserve-3d;
+  perspective: 900px;
+  display:grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 28px;
+  align-items: center;
+
+  /* あなたの「少し上に」がここ。崩さず効かせる */
+  transform: translateY(-6vh);
+}
+
+@media (max-width: 820px){
+  .container{ grid-template-columns:1fr; transform: translateY(-3vh); }
+}
+
+.heading{
+  margin:0;
+  line-height:.95;
+  letter-spacing:-.04em;
+  color:#0c0c0f;
+}
+.heading .kicker{ display:block; font-size: clamp(18px, 4.6vw, 54px); opacity:.95; font-weight:700; }
+.heading .title{ display:block; font-weight:900; font-size: clamp(40px, 8.8vw, 110px); word-break: break-word; }
+
+.desc{ margin:14px 0 0; max-width:52ch; line-height:1.9; color: rgba(12,12,15,.85); font-size:15px; }
+
+.actions{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,.25);
+  background: rgba(255,255,255,.22);
+  backdrop-filter: blur(8px);
+  color: rgba(0,0,0,.86);
+  text-decoration:none;
+  font-size:13px;
+}
+
+.figure{
+  position:relative;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow: 0.45rem 0.45rem 8rem rgb(0 0 0 / 0.30);
+  width:115%;
+  margin-left:-5%;
+}
+.figure::after{
+  content:"";
+  position:absolute; inset:0;
+  background: rgba(255,255,255,.22);
+  mix-blend-mode: screen;
+}
+.figure img{
+  display:block;
+  width:100%;
+  height:auto;
+  filter: brightness(.58) grayscale(100%);
+}
+
+/* ===== modal ===== */
+.modal{
+  position:fixed; inset:0;
+  display:none; place-items:center;
+  background:rgba(0,0,0,.65);
+  z-index:999;
+}
+.modal.is-open{ display:grid; }
+.modal__frame{
+  width:min(1100px, 92vw);
+  height:min(720px, 84vh);
+  border:0;
+  background:#fff;
+  border-radius:18px;
+}
+.modal__close{
+  position:absolute; top:18px; right:18px;
+  width:44px; height:44px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(0,0,0,.35);
+  color:#fff; font-size:26px;
+  cursor:pointer;
+}
+.modal__new{
+  position:absolute; top:24px; left:18px;
+  color:#fff; text-decoration:underline;
+  font-size:14px;
+}
+
+/* =========================
+   Mobile polish (<= 820px)
+   ========================= */
+@media (max-width: 820px){
+
+  /* Header：詰めてタップしやすく */
+  .header-inner{
+    height: 64px;
+    width: min(1100px, 92vw);
+    gap: 10px;
+  }
+  .logo-main{ font-size: 13px; letter-spacing: .16em; }
+  .logo-sub{ font-size: 10px; margin-top: 3px; }
+
+  /* ナビ：横スクロールでスマホ対応（崩さない） */
+  .header-nav{
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .header-nav::-webkit-scrollbar{ display:none; }
+  .header-nav a{
+    font-size: 11px;
+    padding: 8px 8px;
+    white-space: nowrap;
+  }
+
+  /* TEL：消す or 小さく（どっちでも） */
+  .header-info{ display:none; }
+
+  /* main：ヘッダー分だけ */
+  main{ padding-top: 64px; }
+
+  /* セクション：上下の余白を最適化 */
+  section{
+    padding: 6.2rem 0 max(6vh, 2.6rem);
+  }
+
+  /* 1カラム前提で、見出しと画像の順序を美しく */
+  .container{
+    grid-template-columns: 1fr;
+    gap: 16px;
+    transform: translateY(-2vh); /* 上げすぎない */
+  }
+
+  /* 見出し：スマホで読みやすい行間 */
+  .heading{ line-height: .98; }
+  .heading .kicker{ font-size: clamp(16px, 5.2vw, 26px); }
+  .heading .title{ font-size: clamp(34px, 10.5vw, 64px); }
+
+  .desc{
+    font-size: 14px;
+    line-height: 1.85;
+    max-width: 44ch;
+  }
+
+  /* 画像：横はみ出しをやめて“カード感” */
+  .figure{
+    width: 100%;
+    margin-left: 0;
+    border-radius: 16px;
+  }
+}
+
+/* =========================
+   Small phones (<= 390px)
+   ========================= */
+@media (max-width: 390px){
+  .header-inner{ height: 60px; }
+  main{ padding-top: 60px; }
+  .header-nav a{ padding: 7px 7px; }
+  .container{ transform: translateY(-1vh); }
+}

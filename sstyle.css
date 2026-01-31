@@ -1,0 +1,230 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500&family=Zen+Dots&display=swap");
+
+* { box-sizing: border-box; }
+
+body{
+  background:#000;
+  min-height:100vh;
+  margin:0;
+  color:#fff;
+  font-family:"Inter", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  text-shadow:#000 1px 1px 5px, #000 -1px -1px 5px;
+  overflow-x:hidden;
+}
+
+/* ===== HEADER ===== */
+.site-header{
+  position:fixed;
+  top:0; left:0;
+  width:100%;
+  height:72px;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index:20;
+  border-bottom:1px solid rgba(0,0,0,0.08);
+}
+.site-header, .site-header *{ text-shadow:none !important; }
+
+.header-inner{
+  max-width:1400px;
+  height:100%;
+  margin:0 auto;
+  padding:0 40px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:40px;
+}
+
+.header-logo{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  text-decoration:none;
+}
+
+.logo-main{
+  font-family:"Playfair Display", serif;
+  font-size:17px;
+  font-weight:600;
+  letter-spacing:0.18em;
+  color:#111;
+}
+.logo-sub{
+  font-family:"Inter", system-ui, sans-serif;
+  font-size:10px;
+  letter-spacing:0.25em;
+  opacity:0.55;
+  color:#111;
+}
+
+.header-nav{
+  display:flex;
+  justify-content:center;
+  gap:28px;
+}
+.header-nav a{
+  font-size:12px;
+  letter-spacing:0.12em;
+  text-decoration:none;
+  color:#111;
+  position:relative;
+}
+.header-nav a::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-4px;
+  width:100%;
+  height:1px;
+  background:#111;
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .3s ease;
+}
+.header-nav a:hover::after{ transform:scaleX(1); }
+
+.header-info{
+  font-size:11px;
+  letter-spacing:0.1em;
+  white-space:nowrap;
+  color:#111;
+}
+.header-info a{ color:#111; text-decoration:none; }
+
+/* ===== GALLERY ===== */
+.gallery{
+  position:relative;
+  width:100%;
+  height:calc(100vh - 72px);
+  margin-top:72px;
+  overflow:hidden;
+}
+
+/* 起動時の“灯り” */
+.gallery::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  pointer-events:none;
+  background: radial-gradient(closest-side, rgba(255,255,255,.14), rgba(255,255,255,0) 60%);
+  filter: blur(10px);
+  opacity:0;
+  transition: opacity .35s ease;
+}
+.gallery.is-glow::before{ opacity:1; }
+
+/* ▼ここが重要：初期1フレームの「1枚だけ」を消す */
+.cards{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  padding:0;
+  margin:0;
+  width:min(62vw, 460px);
+  height:min(78vh, 640px);
+
+  visibility:hidden; /* 初期は隠す */
+}
+.cards.is-ready{ visibility:visible; }
+
+.cards li{
+  will-change:transform, opacity;
+  list-style:none;
+  position:absolute;
+  inset:0;
+  border:3px solid #fff;
+  border-radius:0;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.45),
+    0 10px 30px rgba(0,0,0,.35);
+}
+.cards li:hover{
+  z-index:10;
+  box-shadow: rgba(255,255,255,.6) 0 4px 15px, rgba(0,0,0,.35) 0 6px 14px;
+}
+
+/* Prev / Next */
+.actions{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+
+  display: flex;
+  justify-content: center; /* ← ここで中央 */
+  gap: 10px;
+
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+.actions button{
+  padding:16px 56px;
+  font-size:11px;
+  letter-spacing:.12em;
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border:1px solid rgba(255,255,255,0.16);
+  border-radius:6px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  transition: background .25s ease, color .25s ease, box-shadow .25s ease, transform .15s ease;
+}
+.actions button:hover{
+  background:rgba(255,255,255,0.10);
+  color:rgba(255,255,255,0.80);
+}
+.actions button:active{
+  transform:translateY(1px);
+  background:rgba(255,255,255,0.35);
+}
+
+/* キャプション（右上） */
+.instruction{
+  position:fixed;
+  top:120px;
+  right:20px;
+  z-index:30;
+  width:min(340px, 42vw);
+  opacity:.95;
+}
+#captionTitle{
+  margin:0 0 10px;
+  font-size:18px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+#captionList{
+  margin:0;
+  padding-left:18px;
+  font-size:12px;
+  line-height:1.6;
+}
+#captionList li{ margin:6px 0; }
+
+/* Refreshボタン（任意） */
+.refresh-btn{
+  position: fixed;
+  left: 20px;
+  bottom: 24px;
+  z-index: 9999;
+  padding: 12px 18px;
+  font-size: 11px;
+  letter-spacing: .1em;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ページ要素の入場（ヘッダー/キャプション/ボタン） */
+.page-enter{ opacity:0; transform: translateY(10px); }
