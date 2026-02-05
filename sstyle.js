@@ -1,5 +1,8 @@
 console.log("[KAENTA] sstyle.js loaded");
 
+// =========================
+// GSAP check
+// =========================
 if (!window.gsap || !window.ScrollTrigger) {
   console.error("[KAENTA] GSAP or ScrollTrigger is missing");
 } else {
@@ -7,52 +10,76 @@ if (!window.gsap || !window.ScrollTrigger) {
 }
 
 // =========================
-// Images
+// Device + image resolver
 // =========================
-const IMAGES = [
-  "about-hero.png",
-  "about-portrait.png",
-  "about-work.png",
-  "article01.png",
-  "article02.png",
-  "article03.png",
-  "cafe01.png",
-  "cafe02.png",
-  "hero-logo.png",
-  "hero-main.png",
-  "hero-main2.png",
-  "indigo-hero.png",
-  "product01.png",
-  "product02.png",
-  "product03.png",
-  "shop01.png",
-  "shop02.png",
-  "workshop01.png",
-  "workshop02.png"
-].map(f => `./assets/${f}`);
+const mqSP = window.matchMedia("(max-width: 820px)"); // ← CSS側と合わせる
+const isSP = () => mqSP.matches;
 
-const CAPTIONS = [
-  { title: "ABOUT HERO", items: ["Ocean View Atelier", "Quiet luxury", "Monochrome mood"] },
-  { title: "PORTRAIT", items: ["Portrait series", "Soft contrast", "Studio tone"] },
-  { title: "ABOUT WORK", items: ["Craft process", "Handmade detail", "Texture focus"] },
-  { title: "ARTICLE 01", items: ["Editorial", "Minimal layout", "Airy spacing"] },
-  { title: "ARTICLE 02", items: ["Story", "Light & shadow", "Rhythm"] },
-  { title: "ARTICLE 03", items: ["Concept", "Material", "Form"] },
-  { title: "CAFE 01", items: ["Local spot", "Calm palette", "Daily scene"] },
-  { title: "CAFE 02", items: ["Coffee time", "Warm tone", "Slow moment"] },
-  { title: "HERO LOGO", items: ["Identity", "Typography", "Balance"] },
-  { title: "HERO MAIN", items: ["Key visual", "Statement", "Atmosphere"] },
-  { title: "HERO MAIN 2", items: ["Variation", "Perspective", "Depth"] },
-  { title: "INDIGO HERO", items: ["Indigo", "Ocean", "Dyeing"] },
-  { title: "PRODUCT 01", items: ["Leather", "Aging", "Stitch"] },
-  { title: "PRODUCT 02", items: ["Form", "Function", "Finish"] },
-  { title: "PRODUCT 03", items: ["Details", "Edge paint", "Hardware"] },
-  { title: "SHOP 01", items: ["Shop", "Display", "Light"] },
-  { title: "SHOP 02", items: ["Space", "Silence", "Flow"] },
-  { title: "WORKSHOP 01", items: ["Workshop", "Hands-on", "Tools"] },
-  { title: "WORKSHOP 02", items: ["Experience", "Indigo bath", "Take home"] },
+// 「ベース名」だけを管理（拡張子・フォルダは自動）
+const IMAGE_BASES = [
+  "about-hero",
+  "about-portrait",
+  "about-work",
+  "article01",
+  "article02",
+  "article03",
+  "cafe01",
+  "cafe02",
+  "hero-logo",
+  "hero-main",
+  "hero-main2",
+  "indigo-hero",
+  "product01",
+  "product02",
+  "product03",
+  "shop01",
+  "shop02",
+  "workshop01",
+  "workshop02"
 ];
 
+// PC: png / SP: jpeg（あなたのフォルダに合わせる）
+function resolveImageSrc(baseName) {
+  return isSP()
+    ? `./assets/SP/${baseName}.jpeg`
+    : `./assets/PC/${baseName}.png`;
+}
+
+// いま使ってるIMAGESを「その瞬間の端末」で組み立てる
+function buildImages() {
+  return IMAGE_BASES.map(resolveImageSrc);
+}
+
+let IMAGES = buildImages();
+
+// =========================
+// Captions（順番は IMAGE_BASES と一致させる）
+// =========================
+const CAPTIONS = [
+  { title: "ABOUT HERO",   items: ["Ocean View Atelier", "Quiet luxury", "Monochrome mood"] },
+  { title: "PORTRAIT",     items: ["Portrait series", "Soft contrast", "Studio tone"] },
+  { title: "ABOUT WORK",   items: ["Craft process", "Handmade detail", "Texture focus"] },
+  { title: "ARTICLE 01",   items: ["Editorial", "Minimal layout", "Airy spacing"] },
+  { title: "ARTICLE 02",   items: ["Story", "Light & shadow", "Rhythm"] },
+  { title: "ARTICLE 03",   items: ["Concept", "Material", "Form"] },
+  { title: "CAFE 01",      items: ["Local spot", "Calm palette", "Daily scene"] },
+  { title: "CAFE 02",      items: ["Coffee time", "Warm tone", "Slow moment"] },
+  { title: "HERO LOGO",    items: ["Identity", "Typography", "Balance"] },
+  { title: "HERO MAIN",    items: ["Key visual", "Statement", "Atmosphere"] },
+  { title: "HERO MAIN 2",  items: ["Variation", "Perspective", "Depth"] },
+  { title: "INDIGO HERO",  items: ["Indigo", "Ocean", "Dyeing"] },
+  { title: "PRODUCT 01",   items: ["Leather", "Aging", "Stitch"] },
+  { title: "PRODUCT 02",   items: ["Form", "Function", "Finish"] },
+  { title: "PRODUCT 03",   items: ["Details", "Edge paint", "Hardware"] },
+  { title: "SHOP 01",      items: ["Shop", "Display", "Light"] },
+  { title: "SHOP 02",      items: ["Space", "Silence", "Flow"] },
+  { title: "WORKSHOP 01",  items: ["Workshop", "Hands-on", "Tools"] },
+  { title: "WORKSHOP 02",  items: ["Experience", "Indigo bath", "Take home"] },
+];
+
+// =========================
+// DOM refs
+// =========================
 const captionTitle = document.getElementById("captionTitle");
 const captionList  = document.getElementById("captionList");
 
@@ -82,6 +109,9 @@ function setCaptionBySeed(seedVal) {
 // Apply images
 // =========================
 function applyImages(seedVal = 0) {
+  // 端末に合わせて毎回作り直す（回転/リサイズで正しい方を使う）
+  IMAGES = buildImages();
+
   cards.forEach((card, i) => {
     const imgIndex = (i + seedVal) % IMAGES.length;
     card.style.backgroundImage = `url("${IMAGES[imgIndex]}")`;
@@ -90,7 +120,7 @@ function applyImages(seedVal = 0) {
 }
 
 // =========================
-// Entry UI (ヘッダー/キャプション/ボタンだけ)
+// Entry UI
 // =========================
 function playEnterUI() {
   if (!window.gsap) return;
@@ -105,7 +135,7 @@ let iteration = 0;
 const spacing = 0.1;
 
 // =========================
-// Auto spin intro（最初から回す）
+// Auto spin intro
 // =========================
 function playAutoSpinIntro({ duration = 1.3, steps = 7, direction = 1 } = {}) {
   if (!scrub || !seamlessLoop || !gsapCards) return;
@@ -145,7 +175,6 @@ function initLoop() {
 
   iteration = 0;
 
-  // ★最重要：初期フレームの「1枚だけ」を消す
   // cardsはCSSで visibility:hidden。ここで準備完了後に表示する。
   if (cardsWrap) cardsWrap.classList.remove("is-ready");
 
@@ -199,7 +228,7 @@ function initLoop() {
   scrub.invalidate().restart();
   trigger.scroll(trigger.start + 1);
 
-  // ★準備できた瞬間に表示（これで“1枚だけ”が消える）
+  // 準備できた瞬間に表示
   if (cardsWrap) cardsWrap.classList.add("is-ready");
 
   // Prev/Next
@@ -238,7 +267,7 @@ function initLoop() {
 }
 
 // =========================
-// buildSeamlessLoop（基本はあなたのまま）
+// buildSeamlessLoop
 // =========================
 function buildSeamlessLoop(items, spacing) {
   const overlap = Math.ceil(1 / spacing);
@@ -254,7 +283,6 @@ function buildSeamlessLoop(items, spacing) {
     }
   });
 
-  // 初期セット（これが“表示前”に走るのが大事）
   gsap.set(items, { xPercent: 300, opacity: 0, scale: 0 });
 
   const l = items.length + overlap * 2;
@@ -308,14 +336,16 @@ window.addEventListener("load", () => {
   applyImages(seed);
   setCaptionBySeed(seed);
 
-  initLoop();              // ★先に回転の準備を完了 → cardsを表示
+  initLoop();
   ScrollTrigger.refresh();
 
-  playEnterUI();           // UIふわっと
-  playAutoSpinIntro({ duration: 1, steps: 5, direction: 3}); // ★開いた瞬間から回る
+  playEnterUI();
+  playAutoSpinIntro({ duration: 1, steps: 5, direction: 3 });
 });
 
+// =========================
 // Refresh Background
+// =========================
 const refreshBtn = document.getElementById("refreshBtn");
 if (refreshBtn) {
   refreshBtn.addEventListener("click", () => {
@@ -324,3 +354,12 @@ if (refreshBtn) {
     setCaptionBySeed(seed);
   });
 }
+
+// =========================
+// On breakpoint change (PC⇄SP)
+// =========================
+mqSP.addEventListener?.("change", () => {
+  // 画像URLだけ差し替え（アニメはそのまま）
+  applyImages(seed);
+  ScrollTrigger.refresh();
+});
