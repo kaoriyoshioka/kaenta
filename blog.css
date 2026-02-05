@@ -96,22 +96,26 @@ section{
 
 .figure{
   position:relative;
-  border-radius:18px;
   overflow:hidden;
+  width:100%;
+  margin-left:0;
+  border-radius:0;
+  aspect-ratio:5 / 4;
   box-shadow: 0.45rem 0.45rem 8rem rgb(0 0 0 / 0.30);
-  width:115%;
-  margin-left:-5%;
 }
+
 .figure::after{
   content:"";
   position:absolute; inset:0;
   background: rgba(255,255,255,.22);
   mix-blend-mode: screen;
+  border-radius:0;
 }
+
 .figure img{
-  display:block;
   width:100%;
-  height:auto;
+  height:100%;
+  object-fit:cover;
   filter: brightness(.58) grayscale(100%);
 }
 
