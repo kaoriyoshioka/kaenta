@@ -2,10 +2,19 @@
 // posts（ここだけ編集）
 // ======================
 const posts = [
-  { key:"NOTE",   title:"余白の設計",         image:"./assets/article01.png", url:"./posts/post-001.html", desc:"空気が通る余白。視線の逃げ道。触れる前に伝わる“間”の設計。" },
-  { key:"INDIGO", title:"藍の深さ",           image:"./assets/article02.png", url:"./posts/post-002.html", desc:"青ではなく、藍。染料の層が生む暗さと透明のバランス。" },
-  { key:"LEATHER",title:"経年というデザイン",  image:"./assets/article03.png", url:"./posts/post-003.html", desc:"使い込むほどに輪郭が整う。劣化ではなく、情報が増える。" },
+  { key:"NOTE",   title:"余白の設計",         image:"article01", url:"./posts/post-001.html", desc:"空気が通る余白。視線の逃げ道。触れる前に伝わる“間”の設計。" },
+  { key:"INDIGO", title:"藍の深さ",           image:"article02", url:"./posts/post-002.html", desc:"青ではなく、藍。染料の層が生む暗さと透明のバランス。" },
+  { key:"LEATHER",title:"経年というデザイン", image:"article03", url:"./posts/post-003.html", desc:"使い込むほどに輪郭が整う。劣化ではなく、情報が増える。" },
 ];
+
+const isSP = window.matchMedia("(max-width: 768px)").matches;
+
+function blogImage(name){
+  return isSP
+    ? `./assets/SP/blog/${name}.jpeg`
+    : `./assets/PC/blog/${name}.png`;
+}
+
 
 // ===== util =====
 const throttle = (fn, wait = 16) => {
@@ -55,11 +64,20 @@ main.innerHTML = posts.map((p, i) => `
       </div>
 
       <figure class="figure section__image">
-        <img src="${p.image}" alt="">
+        <picture>
+          <source media="(max-width: 768px)" srcset="./assets/SP/${p.image}.jpeg">
+          <img
+            src="./assets/PC/${p.image}.png"
+            loading="lazy"
+            decoding="async"
+            alt=""
+          >
+        </picture>
       </figure>
     </div>
   </section>
 `).join("");
+
 
 // ===== modal =====
 const modal = document.getElementById("modal");
