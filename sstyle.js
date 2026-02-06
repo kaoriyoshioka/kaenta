@@ -363,3 +363,71 @@ mqSP.addEventListener?.("change", () => {
   applyImages(seed);
   ScrollTrigger.refresh();
 });
+  // =========================
+  // Mobile swipe (horizontal)
+  // =========================
+  const gallery = document.querySelector(".gallery");
+  const swipeMQ = window.matchMedia("(max-width: 820px)");
+
+  if (gallery) {
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+    gallery.addEventListener("touchstart", (e) => {
+      if (!swipeMQ.matches) return; // スマホだけ
+      if (!e.touches || e.touches.length !== 1) return;
+
+      tracking = true;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    gallery.addEventListener("touchmove", (e) => {
+      if (!tracking) return;
+      if (!swipeMQ.matches) return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+
+      // 横スワイプ意図の時だけ縦スクロールを止める
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    gallery.addEventListener("touchend", (e) => {
+      if (!tracking) return;
+      tracking = false;
+      if (!swipeMQ.matches) return;
+
+      const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
+      const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : startY;
+
+      const dx = endX - startX;
+      const dy = endY - startY;
+
+      // 縦が強いなら無視（通常スクロール）
+      if (Math.abs(dy) > Math.abs(dx)) return;
+
+      // しきい値（小さすぎると誤爆する）
+      const TH = 40;
+      if (Math.abs(dx) < TH) return;
+
+      // 右にスワイプ → 前へ / 左にスワイプ → 次へ（好みで逆でもOK）
+      if (dx > 0) {
+        // Prev
+        seed = (seed - 1 + IMAGES.length) % IMAGES.length;
+        applyImages(seed);
+        setCaptionBySeed(seed);
+        scrubTo(scrub.vars.totalTime - spacing);
+      } else {
+        // Next
+        seed = (seed + 1) % IMAGES.length;
+        applyImages(seed);
+        setCaptionBySeed(seed);
+        scrubTo(scrub.vars.totalTime + spacing);
+      }
+    }, { passive: true });
+  }
