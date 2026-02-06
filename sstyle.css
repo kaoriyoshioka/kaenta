@@ -317,6 +317,17 @@ top: 35%;
     padding:10px 14px;
     font-size:10px;
   }
+  html, body{
+    height: 100%;
+    overflow: hidden;      /* ← 縦スクロールを殺す */
+    overscroll-behavior: none;
+  }
+
+  .gallery{
+    height: calc(100vh - 64px);
+    margin-top: 64px;
+    touch-action: pan-x;   /* ← 横スワイプだけ許可 */
+  }
 }
 
 /* =========================
