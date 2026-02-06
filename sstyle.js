@@ -3,19 +3,20 @@ console.log("[KAENTA] sstyle.js loaded");
 // =========================
 // GSAP check
 // =========================
-if (!window.gsap || !window.ScrollTrigger) {
-  console.error("[KAENTA] GSAP or ScrollTrigger is missing");
-} else {
+if (!window.gsap) {
+  console.error("[KAENTA] GSAP is missing");
+}
+if (window.gsap && window.ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 // =========================
 // Device + image resolver
 // =========================
-const mqSP = window.matchMedia("(max-width: 820px)"); // ← CSS側と合わせる
+const mqSP = window.matchMedia("(max-width: 820px)"); // CSSと合わせる
 const isSP = () => mqSP.matches;
 
-// 「ベース名」だけを管理（拡張子・フォルダは自動）
+// ベース名だけ管理（拡張子・フォルダは自動）
 const IMAGE_BASES = [
   "about-hero",
   "about-portrait",
@@ -38,14 +39,12 @@ const IMAGE_BASES = [
   "workshop02"
 ];
 
-// PC: png / SP: jpeg（あなたのフォルダに合わせる）
 function resolveImageSrc(baseName) {
   return isSP()
     ? `./assets/SP/${baseName}.jpeg`
     : `./assets/PC/${baseName}.png`;
 }
 
-// いま使ってるIMAGESを「その瞬間の端末」で組み立てる
 function buildImages() {
   return IMAGE_BASES.map(resolveImageSrc);
 }
@@ -53,7 +52,7 @@ function buildImages() {
 let IMAGES = buildImages();
 
 // =========================
-// Captions（順番は IMAGE_BASES と一致させる）
+// Captions（IMAGE_BASESと順番一致）
 // =========================
 const CAPTIONS = [
   { title: "ABOUT HERO",   items: ["Ocean View Atelier", "Quiet luxury", "Monochrome mood"] },
@@ -86,6 +85,10 @@ const captionList  = document.getElementById("captionList");
 const cardsWrap = document.querySelector(".cards");
 const cards = Array.from(document.querySelectorAll(".cards .card"));
 
+const nextBtn = document.querySelector(".next");
+const prevBtn = document.querySelector(".prev");
+const gallery = document.querySelector(".gallery");
+
 let seed = 0;
 
 // =========================
@@ -109,7 +112,6 @@ function setCaptionBySeed(seedVal) {
 // Apply images
 // =========================
 function applyImages(seedVal = 0) {
-  // 端末に合わせて毎回作り直す（回転/リサイズで正しい方を使う）
   IMAGES = buildImages();
 
   cards.forEach((card, i) => {
@@ -124,61 +126,76 @@ function applyImages(seedVal = 0) {
 // =========================
 function playEnterUI() {
   if (!window.gsap) return;
-  gsap.to(".page-enter", { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.06 });
+  gsap.to(".page-enter", {
+    opacity: 1,
+    y: 0,
+    duration: 0.55,
+    ease: "power3.out",
+    stagger: 0.06
+  });
 }
 
 // =========================
 // Loop globals
 // =========================
-let trigger, scrub, seamlessLoop, gsapCards;
+let trigger = null;
+let scrub = null;
+let seamlessLoop = null;
+let gsapCards = null;
+
 let iteration = 0;
 const spacing = 0.1;
 
 // =========================
-// Auto spin intro
+// Helpers
 // =========================
-function playAutoSpinIntro({ duration = 1.3, steps = 7, direction = 1 } = {}) {
-  if (!scrub || !seamlessLoop || !gsapCards) return;
+function updateActiveByScrub() {
+  if (!scrub || !gsapCards) return;
 
-  const gallery = document.querySelector(".gallery");
-  if (gallery) gallery.classList.add("is-glow");
+  const step = Math.round(scrub.vars.totalTime / spacing);
+  const active = gsapCards[((step % gsapCards.length) + gsapCards.length) % gsapCards.length];
+  const imgIndex = Number(active.dataset.imgIndex || 0);
 
-  const fromTime = scrub.vars.totalTime || 0;
-  const toTime   = fromTime + direction * steps * spacing;
+  setCaptionByIndex(imgIndex);
+  gsapCards.forEach(c => c.classList.remove("is-center"));
+  active.classList.add("is-center");
+}
 
-  gsap.to(scrub.vars, {
-    totalTime: toTime,
-    duration,
-    ease: "power2.out",
-    onUpdate: () => {
-      scrub.invalidate().restart();
+function scrubTo(totalTime) {
+  if (!scrub) return;
+  scrub.vars.totalTime = totalTime;
+  scrub.invalidate().restart();
+  updateActiveByScrub();
+}
 
-      const step = Math.round(scrub.vars.totalTime / spacing);
-      const active = gsapCards[((step % gsapCards.length) + gsapCards.length) % gsapCards.length];
-      const imgIndex = Number(active.dataset.imgIndex || 0);
-      setCaptionByIndex(imgIndex);
-
-      gsapCards.forEach(c => c.classList.remove("is-center"));
-      active.classList.add("is-center");
-    },
-    onComplete: () => {
-      if (gallery) gallery.classList.remove("is-glow");
-    }
-  });
+function destroyPCScroll() {
+  if (trigger) {
+    trigger.kill();
+    trigger = null;
+  }
+  // ScrollTriggerが存在する場合の安全なrefresh
+  if (window.ScrollTrigger) {
+    ScrollTrigger.refresh();
+  }
 }
 
 // =========================
-// Init seamless loop
+// Init (PC/SP split)
 // =========================
 function initLoop() {
-  if (!window.gsap || !window.ScrollTrigger) return;
+  if (!window.gsap) return;
+
+  const mobile = isSP();
 
   iteration = 0;
 
-  // cardsはCSSで visibility:hidden。ここで準備完了後に表示する。
+  // 初期チラ見え防止：準備できるまで隠す
   if (cardsWrap) cardsWrap.classList.remove("is-ready");
 
-  const snap = gsap.utils.snap(spacing);
+  // 参照更新（端末切替でもOKにする）
+  applyImages(seed);
+  setCaptionBySeed(seed);
+
   gsapCards = gsap.utils.toArray(".cards li");
   seamlessLoop = buildSeamlessLoop(gsapCards, spacing);
 
@@ -189,80 +206,148 @@ function initLoop() {
     paused: true
   });
 
-  trigger = ScrollTrigger.create({
-    start: 0,
-    end: "+=3000",
-    pin: ".gallery",
-    onUpdate(self) {
-      if (self.progress === 1 && self.direction > 0 && !self.wrapping) {
-        iteration++;
-        self.wrapping = true;
-        self.scroll(self.start + 1);
-      } else if (self.progress < 1e-5 && self.direction < 0 && !self.wrapping) {
-        iteration--;
-        if (iteration < 0) {
-          iteration = 9;
-          seamlessLoop.totalTime(seamlessLoop.totalTime() + seamlessLoop.duration() * 10);
-          scrub.pause();
-        }
-        self.wrapping = true;
-        self.scroll(self.end - 1);
-      } else {
-        scrub.vars.totalTime = snap((iteration + self.progress) * seamlessLoop.duration());
-        scrub.invalidate().restart();
-        self.wrapping = false;
-      }
-
-      const step = Math.round(scrub.vars.totalTime / spacing);
-      const active = gsapCards[((step % gsapCards.length) + gsapCards.length) % gsapCards.length];
-      const imgIndex = Number(active.dataset.imgIndex || 0);
-      setCaptionByIndex(imgIndex);
-
-      gsapCards.forEach(c => c.classList.remove("is-center"));
-      active.classList.add("is-center");
-    }
-  });
-
-  // 初期位置確定（ここまで終わってから見せる）
-  scrub.vars.totalTime = spacing * 2;
-  scrub.invalidate().restart();
-  trigger.scroll(trigger.start + 1);
+  // 初期位置
+  scrubTo(spacing * 2);
 
   // 準備できた瞬間に表示
   if (cardsWrap) cardsWrap.classList.add("is-ready");
 
-  // Prev/Next
-  const nextBtn = document.querySelector(".next");
-  const prevBtn = document.querySelector(".prev");
+  // ---- PC：縦スクロール連動 ----
+  if (!mobile && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
 
-  function scrubTo(totalTime) {
-    const progress = (totalTime - seamlessLoop.duration() * iteration) / seamlessLoop.duration();
+    trigger = ScrollTrigger.create({
+      start: 0,
+      end: "+=3000",
+      pin: ".gallery",
+      onUpdate(self) {
+        const snap = gsap.utils.snap(spacing);
 
-    if (progress > 1) {
-      iteration++;
-      trigger.wrapping = true;
-      trigger.scroll(trigger.start + 1);
-    } else if (progress < 0) {
-      iteration--;
-      trigger.wrapping = true;
-      trigger.scroll(trigger.end - 1);
-    } else {
-      trigger.scroll(trigger.start + progress * (trigger.end - trigger.start));
-    }
+        if (self.progress === 1 && self.direction > 0 && !self.wrapping) {
+          iteration++;
+          self.wrapping = true;
+          self.scroll(self.start + 1);
+        } else if (self.progress < 1e-5 && self.direction < 0 && !self.wrapping) {
+          iteration--;
+          if (iteration < 0) {
+            iteration = 9;
+            seamlessLoop.totalTime(seamlessLoop.totalTime() + seamlessLoop.duration() * 10);
+            scrub.pause();
+          }
+          self.wrapping = true;
+          self.scroll(self.end - 1);
+        } else {
+          scrub.vars.totalTime = snap((iteration + self.progress) * seamlessLoop.duration());
+          scrub.invalidate().restart();
+          self.wrapping = false;
+        }
+
+        updateActiveByScrub();
+      }
+    });
+
+    // PC初期位置
+    scrub.vars.totalTime = spacing * 2;
+    scrub.invalidate().restart();
+    trigger.scroll(trigger.start + 1);
+    updateActiveByScrub();
+
+  } else {
+    // ---- SP：縦スクロール不要（pin/ScrollTriggerなし） ----
+    destroyPCScroll();
   }
 
-  if (nextBtn) nextBtn.addEventListener("click", () => {
-    seed = (seed + 1) % IMAGES.length;
-    applyImages(seed);
-    setCaptionBySeed(seed);
-    scrubTo(scrub.vars.totalTime + spacing);
-  });
+  // ボタン（共通）
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      seed = (seed + 1) % IMAGES.length;
+      applyImages(seed);
+      setCaptionBySeed(seed);
+      scrubTo(scrub.vars.totalTime + spacing);
+    };
+  }
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      seed = (seed - 1 + IMAGES.length) % IMAGES.length;
+      applyImages(seed);
+      setCaptionBySeed(seed);
+      scrubTo(scrub.vars.totalTime - spacing);
+    };
+  }
 
-  if (prevBtn) prevBtn.addEventListener("click", () => {
-    seed = (seed - 1 + IMAGES.length) % IMAGES.length;
-    applyImages(seed);
-    setCaptionBySeed(seed);
-    scrubTo(scrub.vars.totalTime - spacing);
+  // ---- SP：横スワイプのみ ----
+  if (mobile && gallery) {
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+    gallery.addEventListener("touchstart", (e) => {
+      if (!isSP()) return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      tracking = true;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    gallery.addEventListener("touchend", (e) => {
+      if (!tracking) return;
+      tracking = false;
+      if (!isSP()) return;
+
+      const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
+      if (!t) return;
+
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+
+      // 縦成分が強い時は無視（ただしSPはoverflow hidden想定）
+      if (Math.abs(dy) > Math.abs(dx)) return;
+
+      const TH = 40;
+      if (Math.abs(dx) < TH) return;
+
+      // 右スワイプ = Prev / 左スワイプ = Next
+      if (dx > 0) {
+        seed = (seed - 1 + IMAGES.length) % IMAGES.length;
+        applyImages(seed);
+        setCaptionBySeed(seed);
+        scrubTo(scrub.vars.totalTime - spacing);
+      } else {
+        seed = (seed + 1) % IMAGES.length;
+        applyImages(seed);
+        setCaptionBySeed(seed);
+        scrubTo(scrub.vars.totalTime + spacing);
+      }
+    }, { passive: true });
+  }
+}
+
+// =========================
+// Auto spin intro（任意：SPは軽め）
+// =========================
+function playAutoSpinIntro() {
+  if (!scrub) return;
+
+  const mobile = isSP();
+  const steps = mobile ? 2 : 5;
+  const duration = mobile ? 0.6 : 1.0;
+
+  if (gallery) gallery.classList.add("is-glow");
+
+  const toTime = (scrub.vars.totalTime || 0) + steps * spacing;
+
+  gsap.to(scrub.vars, {
+    totalTime: toTime,
+    duration,
+    ease: "power2.out",
+    onUpdate: () => {
+      scrub.invalidate().restart();
+      updateActiveByScrub();
+    },
+    onComplete: () => {
+      if (gallery) gallery.classList.remove("is-glow");
+    }
   });
 }
 
@@ -283,6 +368,7 @@ function buildSeamlessLoop(items, spacing) {
     }
   });
 
+  // 初期セット
   gsap.set(items, { xPercent: 300, opacity: 0, scale: 0 });
 
   const l = items.length + overlap * 2;
@@ -337,97 +423,13 @@ window.addEventListener("load", () => {
   setCaptionBySeed(seed);
 
   initLoop();
-  ScrollTrigger.refresh();
-
   playEnterUI();
-  playAutoSpinIntro({ duration: 1, steps: 5, direction: 3 });
+  playAutoSpinIntro();
 });
 
-// =========================
-// Refresh Background
-// =========================
-const refreshBtn = document.getElementById("refreshBtn");
-if (refreshBtn) {
-  refreshBtn.addEventListener("click", () => {
-    seed = (seed + 1) % IMAGES.length;
-    applyImages(seed);
-    setCaptionBySeed(seed);
-  });
-}
-
-// =========================
-// On breakpoint change (PC⇄SP)
-// =========================
+// 端末幅が変わったら再初期化（PC⇄SP）
 mqSP.addEventListener?.("change", () => {
-  // 画像URLだけ差し替え（アニメはそのまま）
-  applyImages(seed);
-  ScrollTrigger.refresh();
+  // 既存のScrollTriggerを殺して作り直す
+  destroyPCScroll();
+  initLoop();
 });
-  // =========================
-  // Mobile swipe (horizontal)
-  // =========================
-  const gallery = document.querySelector(".gallery");
-  const swipeMQ = window.matchMedia("(max-width: 820px)");
-
-  if (gallery) {
-    let startX = 0;
-    let startY = 0;
-    let tracking = false;
-
-    gallery.addEventListener("touchstart", (e) => {
-      if (!swipeMQ.matches) return; // スマホだけ
-      if (!e.touches || e.touches.length !== 1) return;
-
-      tracking = true;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    }, { passive: true });
-
-    gallery.addEventListener("touchmove", (e) => {
-      if (!tracking) return;
-      if (!swipeMQ.matches) return;
-      if (!e.touches || e.touches.length !== 1) return;
-
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-
-      // 横スワイプ意図の時だけ縦スクロールを止める
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-
-    gallery.addEventListener("touchend", (e) => {
-      if (!tracking) return;
-      tracking = false;
-      if (!swipeMQ.matches) return;
-
-      const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
-      const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : startY;
-
-      const dx = endX - startX;
-      const dy = endY - startY;
-
-      // 縦が強いなら無視（通常スクロール）
-      if (Math.abs(dy) > Math.abs(dx)) return;
-
-      // しきい値（小さすぎると誤爆する）
-      const TH = 40;
-      if (Math.abs(dx) < TH) return;
-
-      // 右にスワイプ → 前へ / 左にスワイプ → 次へ（好みで逆でもOK）
-      if (dx > 0) {
-        // Prev
-        seed = (seed - 1 + IMAGES.length) % IMAGES.length;
-        applyImages(seed);
-        setCaptionBySeed(seed);
-        scrubTo(scrub.vars.totalTime - spacing);
-      } else {
-        // Next
-        seed = (seed + 1) % IMAGES.length;
-        applyImages(seed);
-        setCaptionBySeed(seed);
-        scrubTo(scrub.vars.totalTime + spacing);
-      }
-    }, { passive: true });
-  }
