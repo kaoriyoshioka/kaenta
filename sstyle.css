@@ -299,7 +299,7 @@ body{
   .instruction{
     position: fixed;
     top: auto;
-    bottom: 100px;
+    bottom: 60px;
     left: 12px;
     right: 12px;
     width: auto;
