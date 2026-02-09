@@ -330,6 +330,14 @@ body{
     display: none !important;
   }
 }
+/* =========================
+   Mobile: Prev / Next 非表示
+   ========================= */
+@media (max-width: 820px){
+  .actions{
+    display: none !important;
+  }
+}
 
 /* =========================
    Small phones (<= 390px)
