@@ -226,7 +226,7 @@ body{
 
 
 /* =========================
-   Mobile (<= 820px)
+   Mobile (<= 820px) : FINAL
    ========================= */
 @media (max-width: 820px){
 
@@ -236,21 +236,58 @@ body{
     overscroll-behavior:none;
   }
 
+  /* ===== Header (SP) ===== */
   .site-header{ height:64px; }
+
+  /* ★gridを捨ててflexにする：左欠け/中央詰まりを根絶 */
   .header-inner{
-    padding:0 16px;
-    gap:16px;
+    height:100%;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
   }
 
+  .header-logo{
+    flex:0 0 auto;
+    min-width:132px; /* ロゴが潰れない最低幅 */
+  }
+
+  .logo-main{ font-size:16px; letter-spacing:0.16em; }
+  .logo-sub{ font-size:10px; letter-spacing:0.22em; }
+
+  /* ★ナビは残り幅を全部使って横スクロール */
   .header-nav{
+    flex:1 1 auto;
+    display:flex;
+    justify-content:flex-start;
+    align-items:center;
     gap:14px;
+
     overflow-x:auto;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+
+    padding-left:8px;   /* ★先頭文字欠け防止 */
+    margin-left:-8px;   /* 見た目は詰める */
+    scroll-padding-left:12px;
+    padding-right: calc(env(safe-area-inset-right) + 14px); /* ★右端クリップ対策 */
+    margin-right: calc(-1 * (env(safe-area-inset-right) + 14px)); /* 見た目を詰める保険（不要なら消してOK） */
+
+
   }
   .header-nav::-webkit-scrollbar{ display:none; }
+
+  .header-nav a{
+    flex:0 0 auto;
+    white-space:nowrap;
+    font-size:11px;
+    letter-spacing:0.12em;
+  }
+
   .header-info{ display:none; }
 
+  /* ===== Gallery ===== */
   .gallery{
     height:calc(100dvh - 64px);
     margin-top:64px;
@@ -264,23 +301,23 @@ body{
     left:50%;
     transform:translate(-50%, -50%);
   }
-
   .cards li{ border-width:2px; }
+
   .actions{ display:none !important; }
 
-  /* ===== Caption（SP 完成）===== */
+  /* ===== Caption (SP) ===== */
   .instruction{
     position:fixed;
     left:14px;
     right:14px;
 
-    top:auto !important;        /* ★PCの top:120px を殺す */
+    top:auto !important; /* ★PCの top を完全に殺す */
     bottom:calc(env(safe-area-inset-bottom) + 18px);
 
     width:auto;
-    height:auto;                /* ★伸び防止 */
-    max-height:34vh;            /* ★長文でも暴走しない */
-    overflow:auto;              /* ★中身が多い時だけスクロール */
+    height:auto;
+    max-height:34vh;
+    overflow:auto;
 
     background:rgba(0,0,0,.45);
     border:1px solid rgba(255,255,255,.12);
@@ -313,20 +350,23 @@ body{
 
 
 /* =========================
-   Small phones (<= 390px)
+   Small phones (<= 390px) : FINAL
    ========================= */
 @media (max-width: 390px){
+
   .cards{
-    width:84vw;
-    height:56vh;
-    top:36%;
+    width:86vw;
+    height:54vh;
+    top:44%;
   }
 
+  /* ★170pxは廃止：端末差はsafe-areaで吸収 */
   .instruction{
-    bottom:170px;
-    padding:10px 12px;
+    top:auto !important;
+    bottom:calc(env(safe-area-inset-bottom) + 14px);
+    padding:12px 14px;
+    max-height:38vh;
   }
 
   #captionTitle{ font-size:14px; }
 }
-
