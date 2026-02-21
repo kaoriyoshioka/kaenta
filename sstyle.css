@@ -43,7 +43,6 @@ body{
   gap:2px;
   text-decoration:none;
 }
-
 .logo-main{
   font-family:"Playfair Display", serif;
   font-size:17px;
@@ -115,7 +114,7 @@ body{
 }
 .gallery.is-glow::before{ opacity:1; }
 
-/* ▼ここが重要：初期1フレームの「1枚だけ」を消す */
+/* 初期1フレームの「1枚だけ」を消す */
 .cards{
   position:absolute;
   top:50%;
@@ -125,8 +124,7 @@ body{
   margin:0;
   width:min(62vw, 460px);
   height:min(78vh, 640px);
-
-  visibility:hidden; /* 初期は隠す */
+  visibility:hidden;
 }
 .cards.is-ready{ visibility:visible; }
 
@@ -149,21 +147,18 @@ body{
   box-shadow: rgba(255,255,255,.6) 0 4px 15px, rgba(0,0,0,.35) 0 6px 14px;
 }
 
-/* Prev / Next */
+/* Prev / Next（PC用） */
 .actions{
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 24px;
-
-  display: flex;
-  justify-content: center; /* ← ここで中央 */
-  gap: 10px;
-
-  z-index: 9999;
-  pointer-events: auto;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:24px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  z-index:9999;
+  pointer-events:auto;
 }
-
 .actions button{
   padding:16px 56px;
   font-size:11px;
@@ -186,7 +181,7 @@ body{
   background:rgba(255,255,255,0.35);
 }
 
-/* キャプション（右上） */
+/* Caption（PC） */
 .instruction{
   position:fixed;
   top:120px;
@@ -209,7 +204,7 @@ body{
 }
 #captionList li{ margin:6px 0; }
 
-/* Refreshボタン（任意） */
+/* Refreshボタン（不要ならCSSで消せる） */
 .refresh-btn{
   position: fixed;
   left: 20px;
@@ -226,144 +221,108 @@ body{
   -webkit-backdrop-filter: blur(6px);
 }
 
-/* ページ要素の入場（ヘッダー/キャプション/ボタン） */
+/* 入場 */
 .page-enter{ opacity:0; transform: translateY(10px); }
+
+
 /* =========================
    Mobile (<= 820px)
    ========================= */
 @media (max-width: 820px){
 
-  /* --- 縦スクロール不要：SPは固定画面 --- */
+  /* SP：縦スクロール不要 */
   html, body{
-    height: 100%;
-    overflow: hidden;
-    overscroll-behavior: none;
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
   }
 
-  /* ----- Header ----- */
+  /* Header */
   .site-header{ height:64px; }
-
   .header-inner{
     padding:0 16px;
     gap:16px;
   }
 
-  /* ナビは横スクロールOK、ただし“横棒(スクロールバー)”は消す */
+  /* ナビ：横スクロールOK / スクロールバーは非表示 */
   .header-nav{
     gap:14px;
     overflow-x:auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;          /* Firefox */
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
   }
-  .header-nav::-webkit-scrollbar{  /* Chrome/Safari */
-    display:none;
-  }
+  .header-nav::-webkit-scrollbar{ display:none; }
 
   .header-nav a{
     font-size:11px;
     white-space:nowrap;
   }
-
   .header-info{ display:none; }
 
-  /* ----- Gallery ----- */
+  /* Gallery */
   .gallery{
-    height: calc(100vh - 64px);
-    margin-top: 64px;
-    touch-action: pan-x;  /* 横スワイプだけ許可 */
+    height:calc(100vh - 64px);
+    margin-top:64px;
+    touch-action: pan-x;
   }
 
-  /* ----- Cards ----- */
+  /* Cards */
   .cards{
     width:min(78vw, 320px);
     height:min(70vh, 420px);
-    top: 35%; /* ← 画像位置はこのまま */
+    top:35%;
   }
+  .cards li{ border-width:2px; }
 
-  .cards li{
-    border-width: 2px;
-  }
+  /* SPではボタン不要（横スワイプが主役） */
+  .actions{ display:none !important; }
 
-  /* ----- Prev / Next ----- */
-  .actions{
-    bottom: 80px;
-    gap: 8px;
-  }
-  .actions button{
-    padding: 14px 28px;
-    font-size: 10px;
-    letter-spacing: .14em;
-  }
-
-  /* ----- Caption ----- */
+  /* Caption（SP） */
   .instruction{
-    position: fixed;
-    top: auto;
-    bottom: 60px;
-    left: 12px;
-    right: 12px;
-    width: auto;
+    top:auto;
+    bottom:60px;
+    left:12px;
+    right:12px;
+    width:auto;
 
-    background: rgba(0,0,0,.35);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 10px;
-    padding: 12px 14px;
+    background:rgba(0,0,0,.35);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+    padding:12px 14px;
 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
-
   #captionTitle{
-    font-size: 15px;
-    margin: 0 0 6px;
+    font-size:15px;
+    margin:0 0 6px;
   }
-
   #captionList{
-    font-size: 11px;
-    line-height: 1.5;
-    margin: 0;
-    padding-left: 18px;
+    font-size:11px;
+    line-height:1.5;
+    margin:0;
+    padding-left:18px;
   }
 
-  /* ----- Refresh button：不要なので消す ----- */
-  .refresh-btn{
-    display: none !important;
-  }
+  /* Refreshボタン：不要 */
+  .refresh-btn{ display:none !important; }
 }
-/* =========================
-   Mobile: Prev / Next 非表示
-   ========================= */
-@media (max-width: 820px){
-  .actions{
-    display: none !important;
-  }
-}
+
 
 /* =========================
    Small phones (<= 390px)
    ========================= */
 @media (max-width: 390px){
-
   .cards{
-    width: 84vw;
-    height: 56vh;
-    top: 36%; /* 少しだけ下がりやすい端末に保険 */
+    width:84vw;
+    height:56vh;
+    top:36%;
   }
 
-  .actions{
-    bottom: 76px;
-  }
-  .actions button{
-    padding: 12px 22px;
-  }
-
-  /* 390pxでも caption が下に落ちないように維持 */
   .instruction{
-    bottom: 170px;
-    padding: 10px 12px;
+    bottom:170px;
+    padding:10px 12px;
   }
 
-  #captionTitle{
-    font-size: 14px;
-  }
+  #captionTitle{ font-size:14px; }
 }
