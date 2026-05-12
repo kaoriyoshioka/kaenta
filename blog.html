@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BLOG | KAENTA</title>
+  <link rel="stylesheet" href="./header.css" />
   <link rel="stylesheet" href="./blog.css" />
 </head>
 
 <body>
-<header class="site-header">
+<header class="site-header site-header--dark">
   <div class="header-inner">
     <a class="header-logo" href="./index.html" aria-label="KAENTA Home">
       <span class="logo-main">KAENTA</span>
@@ -32,7 +33,6 @@
 <!-- タイムライン（欲しい動きの本体） -->
 <nav class="timeline" aria-label="Timeline">
   <div class="marker" aria-hidden="true"></div>
-
   <div class="nav__track" data-draggable>
     <ul class="nav__list" id="timelineList">
       <!-- JSで生成 -->
@@ -51,12 +51,10 @@
   <iframe class="modal__frame" id="modalFrame" title="Blog post"></iframe>
 </div>
 
-<!-- GSAP（DraggableはClubじゃないのでCDNでOK） -->
+<!-- GSAP -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/Draggable.min.js"></script>
-
-<!-- あなたの制御JS -->
 <script src="./blog.js"></script>
 </body>
 </html>
