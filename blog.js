@@ -63,21 +63,51 @@ main.innerHTML = posts.map((p, i) => `
         </div>
       </div>
 
-      <figure class="figure section__image">
-        <picture>
-          <source media="(max-width: 768px)" srcset="./assets/SP/${p.image}.jpeg">
-          <img
-            src="./assets/PC/${p.image}.png"
-            loading="lazy"
-            decoding="async"
-            alt=""
-          >
-        </picture>
+      <figure class="figure section__image" data-flip>
+        <div class="figure__flip">
+          <!-- 表面：モノクロ -->
+          <div class="figure__front">
+            <picture>
+              <source media="(max-width: 768px)" srcset="./assets/SP/${p.image}.jpeg">
+              <img src="./assets/PC/${p.image}.png" loading="lazy" decoding="async" alt="">
+            </picture>
+          </div>
+          <!-- 裏面：カラー -->
+          <div class="figure__back">
+            <picture>
+              <source media="(max-width: 768px)" srcset="./assets/SP/${p.image}.jpeg">
+              <img src="./assets/PC/${p.image}.png" loading="lazy" decoding="async" alt="">
+            </picture>
+          </div>
+        </div>
       </figure>
     </div>
   </section>
 `).join("");
 
+
+// ===== 画像フリップ =====
+// figure__flipの背景を「完全に透明」にする
+// 回転中に見えるのはセクション自体の背景なので透明が正解
+document.querySelectorAll("[data-flip]").forEach((fig) => {
+  const flip = fig.querySelector(".figure__flip");
+  const front = fig.querySelector(".figure__front");
+  const back  = fig.querySelector(".figure__back");
+  if (!flip || !front || !back) return;
+  flip.style.backgroundColor  = "transparent";
+  front.style.backgroundColor = "transparent";
+  back.style.backgroundColor  = "transparent";
+});
+
+document.addEventListener("click", (e) => {
+  const fig = e.target.closest("[data-flip]");
+  if (!fig) return;
+
+  fig.classList.add("is-flipping");
+  setTimeout(() => fig.classList.remove("is-flipping"), 750);
+
+  fig.classList.toggle("is-flipped");
+});
 
 // ===== modal =====
 const modal = document.getElementById("modal");
