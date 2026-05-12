@@ -12,7 +12,7 @@ window.addEventListener("load", async () => {
   const spacer = document.querySelector(".spacer");
   if (!cols.length || !spacer) return;
 
-  // --- 画像の読み込み完了を待つ（高さ確定させる） ---
+  // --- 画像の読み込み完了を待つ ---
   const images = Array.from(document.images);
   await Promise.all(
     images.map((img) =>
@@ -25,21 +25,15 @@ window.addEventListener("load", async () => {
     )
   );
 
-  // --- 列の内容を「偶数回」複製して、前半=後半を保証（ここがLOOPの肝） ---
+  // --- 列の内容を複製（ループの肝） ---
   function buildPerfectLoop(col) {
     const base = Array.from(col.children);
     if (!base.length) return;
 
-    // 一度高さを確定させる
-    const baseHeights = () => base.reduce((sum, el) => sum + el.getBoundingClientRect().height, 0);
-
-    // まず最低2回（前半=後半）
     col.innerHTML = "";
     base.forEach((el) => col.appendChild(el));
     base.forEach((el) => col.appendChild(el.cloneNode(true)));
 
-    // さらに必要なら「2セットずつ」増やす（常に偶数セット）
-    // 目標：画面高さの3倍くらい（高速スクロールでも破綻しにくい）
     const target = window.innerHeight * 3;
     while (col.scrollHeight < target) {
       base.forEach((el) => col.appendChild(el.cloneNode(true)));
@@ -55,6 +49,38 @@ window.addEventListener("load", async () => {
 
   const getHalf = (col) => col.scrollHeight / 2;
 
+  // =============================================
+  // カラー演出：画面中央に近い画像ほどカラーになる
+  // =============================================
+  const gallery = document.querySelector(".gallery");
+
+  function updateColorEffect() {
+    if (!gallery) return;
+
+    const galleryRect = gallery.getBoundingClientRect();
+    const centerY = galleryRect.top + galleryRect.height / 2;
+    // 中央列（index=1）は常に少しカラー気味にしたいので列ごとに強度を変える
+    const colIntensity = [0.6, 1.0, 0.6]; // 左・中・右
+
+    cols.forEach((col, colIndex) => {
+      const imgs = col.querySelectorAll("img");
+      imgs.forEach((img) => {
+        const rect = img.getBoundingClientRect();
+        const imgCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(imgCenterY - centerY);
+        const maxDist = galleryRect.height * 0.55;
+
+        // 0（遠い）〜 1（中央）の値
+        const proximity = Math.max(0, 1 - distance / maxDist);
+
+        // 列の強度も掛け合わせる
+        const saturation = proximity * colIntensity[colIndex] ?? proximity;
+
+        img.style.filter = `saturate(${saturation})`;
+      });
+    });
+  }
+
   // --- ticker（止まらないベース移動） ---
   const tick = () => {
     cols.forEach((col, i) => {
@@ -67,17 +93,20 @@ window.addEventListener("load", async () => {
       states[i].y = wrap(states[i].y + baseSpeed);
       setters[i](states[i].y);
     });
+
+    // 毎フレーム色を更新
+    updateColorEffect();
   };
 
   gsap.ticker.add(tick);
 
-  // --- スクロールで加速（慣性っぽく） ---
+  // --- スクロールで加速 ---
   ScrollTrigger.create({
     trigger: spacer,
     start: "top top",
     end: "bottom bottom",
     onUpdate(self) {
-      const v = self.getVelocity(); // px/sec
+      const v = self.getVelocity();
       const accel = v * 0.0025;
 
       cols.forEach((col, i) => {
@@ -91,19 +120,17 @@ window.addEventListener("load", async () => {
     }
   });
 
-  // --- リサイズ / 向き変更で破綻しないよう再構築 ---
+  // --- リサイズ対応 ---
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      // 位置をいったん正規化
       cols.forEach((col, i) => {
         const half = getHalf(col);
         const wrap = gsap.utils.wrap(-half, 0);
         states[i].y = wrap(states[i].y);
         setters[i](states[i].y);
       });
-
       ScrollTrigger.refresh();
     }, 150);
   });
