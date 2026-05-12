@@ -47,9 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ScrollTrigger.create({
       trigger: elem,
       start: "top 85%",
-      onEnter: () => animateFrom(elem, 1),
-      onEnterBack: () => animateFrom(elem, -1),
-      onLeave: () => hide(elem)
+      onEnter:     () => animateFrom(elem, 1),
+      onEnterBack: () => animateFrom(elem, -1)
+      // onLeave を削除 → 画面外に出ても消えない
     });
   });
 });
