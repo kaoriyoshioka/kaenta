@@ -61,8 +61,24 @@
       <div class="sp-slider__track" id="spTrack"></div>
     </div>
 
+    <!-- 商品オーバーレイ（SP/PC共通） -->
+    <div class="product-overlay" id="productOverlay" aria-hidden="true">
+      <div class="po-bg"></div>
+      <div class="po-content">
+        <button class="po-close" id="poClose">× CLOSE</button>
+        <div class="po-info">
+          <h2 class="po-name"></h2>
+          <p class="po-material"></p>
+          <p class="po-sizes"></p>
+          <a class="po-btn" href="#" target="_blank" rel="noopener">BASE SHOP →</a>
+        </div>
+      </div>
+    </div>
+
     <!-- SP：説明文 -->
     <p class="sp-caption" id="spCaption" style="display:none;"></p>
+    <!-- SP：タップヒント -->
+    <p class="sp-tap-hint" id="spTapHint">TAP FOR DETAIL</p>
 
     <!-- SP：ドット -->
     <div class="sp-dots" id="spDots"></div>
@@ -73,4 +89,3 @@
   <script src="./sstyle.js"></script>
 </body>
 </html>
-
