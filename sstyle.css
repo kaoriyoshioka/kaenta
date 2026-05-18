@@ -199,16 +199,15 @@ body::before {
 .pc-thumbs {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  flex-wrap: wrap;        /* はみ出したら折り返し */
+  gap: 5px;
   padding: 0 4vw 2.5vh;
-  overflow-x: auto;
-  scrollbar-width: none;
+  max-width: 100%;
 }
-.pc-thumbs::-webkit-scrollbar { display: none; }
 
 .pc-thumb {
-  width: 60px;
-  height: 44px;
+  width: 52px;
+  height: 38px;
   flex-shrink: 0;
   overflow: hidden;
   cursor: pointer;
@@ -240,6 +239,18 @@ body::before {
   width: 100%;
   flex: 1;
   position: relative;
+}
+
+/* SP：タップヒント（説明文の前） */
+.sp-tap-hint {
+  display: none;
+  text-align: center;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 0 0;
 }
 .sp-slider__track {
   display: flex;
@@ -363,4 +374,115 @@ body::before {
 
 @media (max-width: 390px) {
   :root { --header: 78px; }
+}
+
+/* =============================================
+   商品オーバーレイ（PC：メイン画像上 / SP：全画面）
+   ============================================= */
+
+.pc-main { position: relative; }
+
+.product-overlay {
+  position: fixed;
+  z-index: 400;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  overflow: hidden;
+  /* PC：メイン画像の位置に合わせてJSで動的に設定 */
+}
+.product-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 背景 */
+.po-bg {
+  position: absolute;
+  inset: -8%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(14px) brightness(0.32);
+}
+
+/* コンテンツエリア */
+.po-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 閉じるボタン */
+.po-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: rgba(245,243,240,0.55);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  padding: 6px;
+  transition: color 0.2s;
+}
+.po-close:hover { color: #f5f3f0; }
+
+/* 商品情報ボックス */
+.po-info {
+  background: rgba(10,10,12,0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245,243,240,0.15);
+  padding: 2.4rem 3rem;
+  min-width: 260px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.po-name {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(1.6rem, 2.5vw, 2.6rem);
+  letter-spacing: 0.04em;
+  color: #f5f3f0;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.po-material,
+.po-sizes {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(245,243,240,0.6);
+  margin: 0;
+}
+
+.po-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.6rem;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  padding: 8px 20px;
+  transition: background 0.2s, color 0.2s;
+}
+.po-btn:hover {
+  background: var(--accent);
+  color: var(--offblack);
 }
